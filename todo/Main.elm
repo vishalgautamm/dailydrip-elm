@@ -4,16 +4,38 @@ import Html exposing (..)
 
 
 type alias Model =
-    Int
+    { todos : List Todo
+    , todo : Todo
+    , filter : FilterState
+    }
+
+
+type alias Todo =
+    { title : String
+    , completed : Bool
+    , editing : Bool
+    }
+
+
+type FilterState
+    = All
+    | Active
+    | Completed
 
 
 type Msg
-    = NoOp
+    = Add Todo
+    | Complete Todo
+    | Delete Todo
+    | Filter FilterState
 
 
 initialModel : Model
 initialModel =
-    0
+    { todos = []
+    , todo = Todo "" False False
+    , filter = All
+    }
 
 
 update : Msg -> Model -> Model
