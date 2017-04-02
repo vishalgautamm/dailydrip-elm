@@ -50,6 +50,17 @@ view model =
         [ header [ class "header" ]
             [ h1 [] [ text "todos" ] ]
         , input [ class "new-todo", placeholder "What needs done?", autofocus True ] []
+        , section [ class "main" ]
+            [ ul [ class "todo-list" ]
+                [ li [ class "completed" ]
+                    [ div [ class "view" ]
+                        [ input [ class "toggle", type_ "checkbox", checked True ] []
+                        , label [] [ text "First Todo" ]
+                        , button [ class "destroy" ] []
+                        ]
+                    ]
+                ]
+            ]
         ]
 
 
