@@ -5,7 +5,10 @@ import Html.Events exposing (onClick)
 
 
 type alias Model =
-    Int
+    { counter : Int
+    , decrements : Int
+    , increments : Int
+    }
 
 
 type Msg
@@ -17,25 +20,27 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Increment ->
-            model + 1
+            { model | counter = model.counter + 1, increments = model.increments + 1 }
 
         Decrement ->
-            model - 1
+            { model | counter = model.counter - 1, decrements = model.decrements + 1 }
 
 
 view : Model -> Html Msg
 view model =
     div []
         [ button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (toString model) ]
+        , div [] [ text (toString model.counter) ]
         , button [ onClick Increment ] [ text "+" ]
+        , h3 [] [ text ("# of increments: " ++ (toString model.increments)) ]
+        , h3 [] [ text ("# of decrements: " ++ (toString model.decrements)) ]
         ]
 
 
 main : Program Never Model Msg
 main =
     Html.beginnerProgram
-        { model = 0
+        { model = Model 0 0 0
         , view = view
         , update = update
         }
