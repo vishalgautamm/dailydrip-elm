@@ -4,6 +4,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 
 
+-- MODEL
+
+
 type alias Model =
     { todos : List Todo
     , todo : Todo
@@ -33,15 +36,34 @@ type Msg
 
 initialModel : Model
 initialModel =
-    { todos = []
+    { todos = [ Todo "The first todo" False False ]
     , todo = Todo "" False False
     , filter = All
     }
 
 
+
+-- UPDATE
+
+
 update : Msg -> Model -> Model
 update msg model =
     model
+
+
+
+-- VIEW
+
+
+todoView : Todo -> Html Msg
+todoView todo =
+    li [ classList [ ( "completed", todo.completed ) ] ]
+        [ div [ class "view" ]
+            [ input [ class "toggle", type_ "checkbox", checked todo.completed ] []
+            , label [] [ text todo.title ]
+            , button [ class "destroy" ] []
+            ]
+        ]
 
 
 view : Model -> Html Msg
@@ -52,14 +74,7 @@ view model =
         , input [ class "new-todo", placeholder "What needs done?", autofocus True ] []
         , section [ class "main" ]
             [ ul [ class "todo-list" ]
-                [ li [ class "completed" ]
-                    [ div [ class "view" ]
-                        [ input [ class "toggle", type_ "checkbox", checked True ] []
-                        , label [] [ text "First Todo" ]
-                        , button [ class "destroy" ] []
-                        ]
-                    ]
-                ]
+                (List.map todoView model.todos)
             ]
         ]
 
