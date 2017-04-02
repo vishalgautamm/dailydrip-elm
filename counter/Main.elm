@@ -11,6 +11,11 @@ type alias Model =
     }
 
 
+initialModel : Model
+initialModel =
+    Model 0 0 0
+
+
 type Msg
     = Increment
     | Decrement
@@ -40,7 +45,7 @@ view model =
 main : Program Never Model Msg
 main =
     Html.beginnerProgram
-        { model = Model 0 0 0
+        { model = initialModel
         , view = view
         , update = update
         }
