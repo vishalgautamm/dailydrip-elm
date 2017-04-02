@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 type alias Model =
@@ -45,7 +46,11 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [] [ text "todos" ]
+    section [ class "todoapp" ]
+        [ header [ class "header" ]
+            [ h1 [] [ text "todos" ] ]
+        , input [ class "new-todo", placeholder "What needs done?", autofocus True ] []
+        ]
 
 
 main : Program Never Model Msg
