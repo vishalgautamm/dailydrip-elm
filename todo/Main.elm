@@ -2,6 +2,8 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (on, keyCode)
+import Json.Decode as Json
 
 
 -- MODEL
@@ -36,9 +38,17 @@ type Msg
 
 initialModel : Model
 initialModel =
-    { todos = [ Todo "The first todo" False False ]
-    , todo = Todo "" False False
+    { todos = [ fakeTodo ]
+    , todo = fakeTodo
     , filter = All
+    }
+
+
+fakeTodo : Todo
+fakeTodo =
+    { title = "A fake todo"
+    , completed = False
+    , editing = False
     }
 
 
@@ -48,11 +58,47 @@ initialModel =
 
 update : Msg -> Model -> Model
 update msg model =
-    model
+    case msg of
+        Add todo ->
+            { model | todos = fakeTodo :: model.todos }
+
+        Complete todo ->
+            model
+
+        Delete todo ->
+            model
+
+        Filter filterState ->
+            model
 
 
 
 -- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    section [ class "todoapp" ]
+        [ header [ class "header" ]
+            [ h1 [] [ text "todos" ] ]
+        , newTodoInput model
+        , section [ class "main" ]
+            [ ul [ class "todo-list" ]
+                (List.map todoView model.todos)
+            ]
+        ]
+
+
+newTodoInput : Model -> Html Msg
+newTodoInput model =
+    input
+        [ class "new-todo"
+        , placeholder "What needs done?"
+        , autofocus True
+        , onEnter (Add fakeTodo)
+        , value model.todo.title
+        ]
+        []
 
 
 todoView : Todo -> Html Msg
@@ -66,17 +112,16 @@ todoView todo =
         ]
 
 
-view : Model -> Html Msg
-view model =
-    section [ class "todoapp" ]
-        [ header [ class "header" ]
-            [ h1 [] [ text "todos" ] ]
-        , input [ class "new-todo", placeholder "What needs done?", autofocus True ] []
-        , section [ class "main" ]
-            [ ul [ class "todo-list" ]
-                (List.map todoView model.todos)
-            ]
-        ]
+onEnter : Msg -> Attribute Msg
+onEnter msg =
+    let
+        isEnter code =
+            if code == 13 then
+                Json.succeed msg
+            else
+                Json.fail "Ignored key"
+    in
+        on "keydown" (Json.andThen isEnter keyCode)
 
 
 main : Program Never Model Msg
