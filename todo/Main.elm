@@ -68,12 +68,12 @@ update msg model =
         Add ->
             { model
                 | todos = model.todo :: model.todos
-                , todo = newTodo
+                , todo = { newTodo | id = model.nextId }
                 , nextId = model.nextId + 1
             }
 
         UpdateField title ->
-            { model | todo = Todo title False False 0 }
+            { model | todo = Todo title False False model.todo.id }
 
         Complete todo ->
             let
