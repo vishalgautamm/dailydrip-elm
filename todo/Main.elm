@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, keyCode)
+import Html.Events exposing (on, keyCode, onInput)
 import Json.Decode as Json
 
 
@@ -34,12 +34,13 @@ type Msg
     | Complete Todo
     | Delete Todo
     | Filter FilterState
+    | Update String
 
 
 initialModel : Model
 initialModel =
     { todos = [ fakeTodo ]
-    , todo = fakeTodo
+    , todo = Todo "" False False
     , filter = All
     }
 
@@ -60,7 +61,14 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Add todo ->
-            { model | todos = fakeTodo :: model.todos }
+            -- refactor: todo param no longer necessary
+            { model
+                | todos = model.todo :: model.todos
+                , todo = Todo "" False False
+            }
+
+        Update title ->
+            { model | todo = Todo title False False }
 
         Complete todo ->
             model
@@ -95,7 +103,8 @@ newTodoInput model =
         [ class "new-todo"
         , placeholder "What needs done?"
         , autofocus True
-        , onEnter (Add fakeTodo)
+        , onEnter (Add model.todo)
+        , onInput Update
         , value model.todo.title
         ]
         []
