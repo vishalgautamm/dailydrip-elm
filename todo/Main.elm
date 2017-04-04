@@ -30,24 +30,24 @@ type FilterState
 
 
 type Msg
-    = Add Todo
+    = Add
     | Complete Todo
     | Delete Todo
+    | UpdateField String
     | Filter FilterState
-    | Update String
 
 
 initialModel : Model
 initialModel =
-    { todos = [ fakeTodo ]
-    , todo = Todo "" False False
+    { todos = [ Todo "The first todo" False False ]
+    , todo = newTodo
     , filter = All
     }
 
 
-fakeTodo : Todo
-fakeTodo =
-    { title = "A fake todo"
+newTodo : Todo
+newTodo =
+    { title = ""
     , completed = False
     , editing = False
     }
@@ -60,14 +60,13 @@ fakeTodo =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Add todo ->
-            -- refactor: todo param no longer necessary
+        Add ->
             { model
                 | todos = model.todo :: model.todos
-                , todo = Todo "" False False
+                , todo = newTodo
             }
 
-        Update title ->
+        UpdateField title ->
             { model | todo = Todo title False False }
 
         Complete todo ->
@@ -103,8 +102,8 @@ newTodoInput model =
         [ class "new-todo"
         , placeholder "What needs done?"
         , autofocus True
-        , onEnter (Add model.todo)
-        , onInput Update
+        , onEnter Add
+        , onInput UpdateField
         , value model.todo.title
         ]
         []
