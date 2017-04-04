@@ -34,6 +34,7 @@ type FilterState
 type Msg
     = Add
     | Complete Todo
+    | Uncomplete Todo
     | Delete Todo
     | UpdateField String
     | Filter FilterState
@@ -84,6 +85,16 @@ update msg model =
             in
                 { model | todos = List.map updateTodo model.todos }
 
+        Uncomplete todo ->
+            let
+                updateTodo thisTodo =
+                    if thisTodo.id == todo.id then
+                        { todo | completed = False }
+                    else
+                        thisTodo
+            in
+                { model | todos = List.map updateTodo model.todos }
+
         Delete todo ->
             model
 
@@ -123,19 +134,28 @@ newTodoInput model =
 
 todoView : Todo -> Html Msg
 todoView todo =
-    li [ classList [ ( "completed", todo.completed ) ] ]
-        [ div [ class "view" ]
-            [ input
-                [ class "toggle"
-                , type_ "checkbox"
-                , checked todo.completed
-                , onCheck (\_ -> Complete todo)
+    let
+        handleComplete =
+            case todo.completed of
+                True ->
+                    (\_ -> Uncomplete todo)
+
+                False ->
+                    (\_ -> Complete todo)
+    in
+        li [ classList [ ( "completed", todo.completed ) ] ]
+            [ div [ class "view" ]
+                [ input
+                    [ class "toggle"
+                    , type_ "checkbox"
+                    , checked todo.completed
+                    , onCheck handleComplete
+                    ]
+                    []
+                , label [] [ text todo.title ]
+                , button [ class "destroy" ] []
                 ]
-                []
-            , label [] [ text todo.title ]
-            , button [ class "destroy" ] []
             ]
-        ]
 
 
 onEnter : Msg -> Attribute Msg
