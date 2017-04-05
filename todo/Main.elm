@@ -96,7 +96,7 @@ update msg model =
                 { model | todos = List.map updateTodo model.todos }
 
         Delete todo ->
-            model
+            { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
 
         Filter filterState ->
             { model | filter = filterState }
@@ -190,7 +190,7 @@ todoView todo =
                     ]
                     []
                 , label [] [ text todo.title ]
-                , button [ class "destroy" ] []
+                , button [ class "destroy", onClick (Delete todo) ] []
                 ]
             ]
 
