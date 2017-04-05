@@ -36,6 +36,7 @@ type Msg
     | Complete Todo
     | Uncomplete Todo
     | Delete Todo
+    | ClearCompleted
     | UpdateField String
     | Filter FilterState
 
@@ -98,6 +99,9 @@ update msg model =
         Delete todo ->
             { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
 
+        ClearCompleted ->
+            { model | todos = List.filter (\t -> not t.completed) model.todos }
+
         Filter filterState ->
             { model | filter = filterState }
 
@@ -126,7 +130,7 @@ view model =
                 , filterItemView model Active
                 , filterItemView model Completed
                 ]
-            , button [ class "clear-completed" ] [ text "Clear completed" ]
+            , button [ class "clear-completed", onClick ClearCompleted ] [ text "Clear completed" ]
             ]
         ]
 
