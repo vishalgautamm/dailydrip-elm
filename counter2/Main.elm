@@ -21,25 +21,32 @@ type Msg
     | Decrement
     | NoOp
 
+
 port jsMsgs : (Int -> msg) -> Sub msg
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+port increment : () -> Cmd msg
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            ({ model | counter = model.counter + 1, increments = model.increments + 1 }, Cmd.none)
+            ( { model | counter = model.counter + 1, increments = model.increments + 1 }, increment () )
 
         Decrement ->
-            ({ model | counter = model.counter - 1, decrements = model.decrements + 1 }, Cmd.none)
+            ( { model | counter = model.counter - 1, decrements = model.decrements + 1 }, Cmd.none )
+
         NoOp ->
-            (model, Cmd.none)
+            ( model, Cmd.none )
+
 
 mapJsMsg : Int -> Msg
 mapJsMsg int =
     case int of
         1 ->
             Increment
+
         _ ->
             NoOp
 
@@ -54,14 +61,16 @@ view model =
         , h3 [] [ text ("# of decrements: " ++ (toString model.decrements)) ]
         ]
 
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     jsMsgs mapJsMsg
 
+
 main : Program Never Model Msg
 main =
     Html.program
-        { init = (initialModel, Cmd.none)
+        { init = ( initialModel, Cmd.none )
         , view = view
         , update = update
         , subscriptions = subscriptions
