@@ -21,14 +21,14 @@ type Msg
     | Decrement
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Increment ->
-            { model | counter = model.counter + 1, increments = model.increments + 1 }
+            ({ model | counter = model.counter + 1, increments = model.increments + 1 }, Cmd.none)
 
         Decrement ->
-            { model | counter = model.counter - 1, decrements = model.decrements + 1 }
+            ({ model | counter = model.counter - 1, decrements = model.decrements + 1 }, Cmd.none)
 
 
 view : Model -> Html Msg
@@ -44,8 +44,9 @@ view model =
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = initialModel
+    Html.program
+        { init = (initialModel, Cmd.none)
         , view = view
         , update = update
+        , subscriptions = always Sub.none
         }
