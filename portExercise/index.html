@@ -4,11 +4,23 @@
     <meta charset="utf-8">
   </head>
   <body>
+    <h1 id="result">Result</h1>
+    <input type="text" name="x" id="x" />
+    <button id="mainButton">Square It!</button>
     <div id="main"></div>
     <script src="main.js"></script>
     <script>
       var node = document.getElementById("main");
-      Elm.Main.embed(node);
+      var app = Elm.Main.embed(node);
+      document.getElementById("mainButton").onclick = function() {
+        if (parseInt(document.getElementById("x").value)) {
+          app.ports.click.send(parseInt(document.getElementById("x").value));
+        }
+      }
+      app.ports.setResult.subscribe( function(result) {
+        document.getElementById("result").innerHTML = result;
+    });
+
     </script>
   </body>
 </html>
