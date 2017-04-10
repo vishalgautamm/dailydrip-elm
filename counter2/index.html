@@ -16,11 +16,11 @@
       });
 
       app.ports.storage.subscribe(function(data) {
-        localStorage.setItem('counter', data);
+        localStorage.setItem('counter', JSON.stringify(data));
       });
 
-      var currentCount = localStorage.getItem("counter");
-      app.ports.storageInput.send(Number(currentCount));
+      var currentModel = localStorage.getItem("counter");
+      app.ports.storageInput.send(JSON.parse(currentModel));
 
     </script>
   </body>
