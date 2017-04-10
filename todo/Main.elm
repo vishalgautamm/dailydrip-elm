@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -39,6 +39,7 @@ type Msg
     | ClearCompleted
     | UpdateField String
     | Filter FilterState
+    | SetModel Model
 
 
 newTodo : Todo
@@ -60,21 +61,38 @@ initialModel =
 
 
 
+-- PORTS
+
+
+port storageInput : (Model -> msg) -> Sub msg
+
+
+port storage : Model -> Cmd msg
+
+
+subscriptions : Model -> Sub msg
+subscriptions model =
+    Sub.none
+
+
+
 -- UPDATE
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Add ->
-            { model
+            ( { model
                 | todos = model.todo :: model.todos
                 , todo = { newTodo | id = model.nextId }
                 , nextId = model.nextId + 1
-            }
+              }
+            , Cmd.none
+            )
 
         UpdateField title ->
-            { model | todo = Todo title False False model.todo.id }
+            ( { model | todo = Todo title False False model.todo.id }, Cmd.none )
 
         Complete todo ->
             let
@@ -84,7 +102,7 @@ update msg model =
                     else
                         thisTodo
             in
-                { model | todos = List.map updateTodo model.todos }
+                ( { model | todos = List.map updateTodo model.todos }, Cmd.none )
 
         Uncomplete todo ->
             let
@@ -94,16 +112,19 @@ update msg model =
                     else
                         thisTodo
             in
-                { model | todos = List.map updateTodo model.todos }
+                ( { model | todos = List.map updateTodo model.todos }, Cmd.none )
 
         Delete todo ->
-            { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
+            ( { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }, Cmd.none )
 
         ClearCompleted ->
-            { model | todos = List.filter (\t -> not t.completed) model.todos }
+            ( { model | todos = List.filter (\t -> not t.completed) model.todos }, Cmd.none )
 
         Filter filterState ->
-            { model | filter = filterState }
+            ( { model | filter = filterState }, Cmd.none )
+
+        SetModel model ->
+            ( model, Cmd.none )
 
 
 
@@ -213,8 +234,9 @@ onEnter msg =
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = initialModel
+    Html.program
+        { init = ( initialModel, Cmd.none )
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
