@@ -7,12 +7,20 @@
     <script src="main.js"></script>
     <script>
       var app = Elm.Main.fullscreen();
+      window.app = app;
+
       var incrementClickCount = 0;
       app.ports.increment.subscribe(function() {
         incrementClickCount += 1;
         console.log("Increment has been clicked " + incrementClickCount + " times.");
       });
-      window.app = app;
+
+      app.ports.storage.subscribe(function(data) {
+        localStorage.setItem('counter', data);
+      });
+
+      var currentCount = localStorage.getItem("counter");
+      app.ports.storageInput.send(Number(currentCount));
 
     </script>
   </body>

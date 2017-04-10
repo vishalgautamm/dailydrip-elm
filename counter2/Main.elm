@@ -19,23 +19,54 @@ initialModel =
 type Msg
     = Increment
     | Decrement
+    | Set Int
     | NoOp
 
 
 port jsMsgs : (Int -> msg) -> Sub msg
 
 
+port storageInput : (Int -> msg) -> Sub msg
+
+
 port increment : () -> Cmd msg
+
+
+port storage : Int -> Cmd msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            ( { model | counter = model.counter + 1, increments = model.increments + 1 }, increment () )
+            let
+                newModel =
+                    { model
+                        | counter = model.counter + 1
+                        , increments = model.increments + 1
+                    }
+            in
+                ( newModel
+                , Cmd.batch
+                    [ increment ()
+                    , storage newModel.counter
+                    ]
+                )
 
         Decrement ->
-            ( { model | counter = model.counter - 1, decrements = model.decrements + 1 }, Cmd.none )
+            let
+                newModel =
+                    { model
+                        | counter = model.counter - 1
+                        , decrements = model.decrements + 1
+                    }
+            in
+                ( newModel
+                , storage newModel.counter
+                )
+
+        Set newCount ->
+            ( { model | counter = newCount }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -64,7 +95,10 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    jsMsgs mapJsMsg
+    Sub.batch
+        [ jsMsgs mapJsMsg
+        , storageInput Set
+        ]
 
 
 main : Program Never Model Msg
