@@ -11,8 +11,9 @@ import Json.Decode as Decode
 
 
 type alias Model =
-    { topic : String
-    , gifUrl : String
+    { icon_url : String
+    , id : String
+    , value : String
     }
 
 
@@ -21,38 +22,14 @@ type alias Model =
 
 
 type Msg
-    = RequestMore
-    | NewGif (Result Http.Error String)
+    = NewJoke
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        RequestMore ->
-            ( model, getRandomGif model.topic )
-
-        NewGif (Ok url) ->
-            ( { model | gifUrl = url }, Cmd.none )
-
-        NewGif (Err _) ->
+        NewJoke ->
             ( model, Cmd.none )
-
-
-getRandomGif : String -> Cmd Msg
-getRandomGif topic =
-    let
-        url =
-            "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
-
-        request =
-            Http.get url decodeGifUrl
-    in
-        Http.send NewGif request
-
-
-decodeGifUrl : Decode.Decoder String
-decodeGifUrl =
-    Decode.at [ "data", "image_url" ] Decode.string
 
 
 
@@ -62,9 +39,9 @@ decodeGifUrl =
 view : Model -> Html Msg
 view model =
     div []
-        [ h2 [] [ text model.topic ]
-        , div [] [ img [ src model.gifUrl ] [] ]
-        , button [ onClick RequestMore ] [ text "More, better..." ]
+        [ h2 [] [ text "Chuck Norris..." ]
+        , div [] [ p [] [ text "joke" ] ]
+        , button [] [ text "Get Joke" ]
         ]
 
 
@@ -72,19 +49,15 @@ view model =
 -- MAIN
 
 
-init : String -> ( Model, Cmd Msg )
-init topic =
-    let
-        waitingUrl =
-            "https://i.imgur.com/i6eXrfS.gif"
-    in
-        ( Model topic waitingUrl, getRandomGif topic )
+init : ( Model, Cmd Msg )
+init =
+    ( Model "" "" "", Cmd.none )
 
 
 main : Program Never Model Msg
 main =
     Html.program
-        { init = init "cats"
+        { init = init
         , view = view
         , update = update
         , subscriptions = always Sub.none
